@@ -6,7 +6,8 @@ before_install:
   - docker build -t npvinhphat/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run -e CI=true phatngu/react-test npm test
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker run -e CI=true npvinhphat/react-test npm test
 
 after_success:
   - docker build -t phatngu/multi-client ./client
