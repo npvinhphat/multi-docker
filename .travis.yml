@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t npvinhphat/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run phatngu/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t phatngu/multi-client ./client
+  - docker build -t phatngu/multi-nginx ./nginx
+  - docker build -t phatngu/multi-server ./server
+  - docker build -t phatngu/multi-worker ./worker
+  # Login to Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Push images to dockerhub
+  - docker push phatngu/multi-client
+  - docker push phatngu/multi-nginx
+  - docker push phatngu/multi-server
+  - docker push phatngu/multi-worker
